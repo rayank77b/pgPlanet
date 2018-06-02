@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import pygame
+from random import randint
 
 X_SCREEN=800
 Y_SCREEN=600
@@ -42,6 +43,11 @@ def key_events():
                 return False
     return True
 
+def randdirect():
+    if(randint(0,10)%2):
+        return 1
+    return -1
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((X_SCREEN, Y_SCREEN))
@@ -53,12 +59,15 @@ def main():
     clock = pygame.time.Clock()
     running=True
     clock.tick(30) # frame rate 30 ticks
-    m1=Mass(300,400,10,1,1,0.5,0.3)
+    m=list()
+    for i in range(100):
+        m.append(Mass(randint(0,X_SCREEN),randint(0,Y_SCREEN),randint(2,10), randdirect(), randdirect(),randint(1,30)/30.0,randint(1,30)/30.0))
     while running:
         screen.fill((0, 0, 0))
         running = key_events()
-        m1.calc()
-        m1.draw_me(screen)
+        for m1 in m:
+            m1.calc()
+            m1.draw_me(screen)
         pygame.display.flip()
 
 

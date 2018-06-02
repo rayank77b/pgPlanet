@@ -6,30 +6,24 @@ X_SCREEN=800
 Y_SCREEN=600
 
 class Mass:
-    def __init__(self,x,y,d,xd,yd,xv,yv):
+    def __init__(self,x,y,d,xv,yv):
         self.x=x
         self.y=y
         self.d=d  # durchmesser
-        self.direction_x=xd
-        self.direction_y=yd
         self.speed_x=xv
         self.speed_y=yv
 
     def calc(self):
-        if(self.direction_x==1):
-            if(self.x>(X_SCREEN-self.d)):
-                self.direction_x=-1
-        if(self.direction_x==-1):
-            if(self.x<0):
-                self.direction_x=1
-        if(self.direction_y==1):
-            if(self.y>(Y_SCREEN-self.d)):
-                self.direction_y=-1
-        if(self.direction_y==-1):
-            if(self.y<0):
-                self.direction_y=1
-        self.x = self.x + self.direction_x*self.speed_x
-        self.y = self.y + self.direction_y*self.speed_y
+        if(self.x>(X_SCREEN-self.d)):
+            self.speed_x=-1*self.speed_x
+        if(self.x<0):
+            self.speed_x=-1*self.speed_x
+        if(self.y>(Y_SCREEN-self.d)):
+            self.speed_y=-1*self.speed_y
+        if(self.y<0):
+            self.speed_y=-1*self.speed_y
+        self.x = self.x + self.speed_x
+        self.y = self.y + self.speed_y
     
     def draw_me(self, screen):
         pygame.draw.rect(screen, (0, 128+self.d, 255), pygame.Rect(self.x, self.y, self.d, self.d))
@@ -60,8 +54,8 @@ def main():
     running=True
     clock.tick(30) # frame rate 30 ticks
     m=list()
-    for i in range(100):
-        m.append(Mass(randint(0,X_SCREEN),randint(0,Y_SCREEN),randint(2,10), randdirect(), randdirect(),randint(1,30)/30.0,randint(1,30)/30.0))
+    for i in range(50):
+        m.append(Mass(randint(0,X_SCREEN),randint(0,Y_SCREEN),randint(2,10), randint(-30,30)/30.0,randint(-30,30)/30.0))
     while running:
         screen.fill((0, 0, 0))
         running = key_events()

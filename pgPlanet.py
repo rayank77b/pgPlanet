@@ -6,7 +6,7 @@ import math
 X_SCREEN=1024
 Y_SCREEN=800
 RASTER=1000
-ACCEL=50.0
+ACCEL=5000.0
 
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
@@ -34,18 +34,15 @@ class Mass:
         return math.sqrt(dx*dx+dy*dy)
     
     def calc_speed(self, masses):
+        self.accel_x = 0.0
+        self.accel_y = 0.0
         for m in masses:
             if((self.x!=m.x) and (self.y!=m.y)):
                 delta = self._triangle(m.x, m.y)
-                c = ACCEL*(self.d*m.d)/(delta*delta)
-                if(self.x<m.x):
-                    self.accel_x = self.accel_x + c
-                else:
-                    self.accel_x = self.accel_x - c
-                if(self.y<m.y):
-                    self.accel_y = self.accel_y + c
-                else:
-                    self.accel_y = self.accel_y - c
+                #print delta, 
+                self.accel_x = self.accel_x + ACCEL*(1.0*self.d*m.d)*(m.x-self.x)/(delta*delta)
+                self.accel_y = self.accel_y + ACCEL*(1.0*self.d*m.d)*(m.y-self.y)/(delta*delta)
+        #print "xy ( %d | %d) v: ( %d | %d) acell: ( %f | %f ) "%(self.x,self.y, self.speed_x, self.speed_y,self.accel_x,self.accel_y)
         self.speed_x = self.speed_x + self.accel_x
         self.speed_y = self.speed_y + self.accel_y
     
@@ -53,9 +50,9 @@ class Mass:
         # draw the object
         pygame.draw.circle(screen, BLUE, [int(self.x/RASTER), int(self.y/RASTER)], self.d)
         # draw the veloecity
-        pygame.draw.line(screen, WHITE, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.speed_x, int(self.y/RASTER)+self.speed_y], 1)
+        pygame.draw.line(screen, WHITE, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.speed_x/10, int(self.y/RASTER)+self.speed_y/10], 1)
         # draw the acceleration
-        pygame.draw.line(screen, RED, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.accel_x*1000, int(self.y/RASTER)+self.accel_y*1000], 1)
+        pygame.draw.line(screen, RED, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.accel_x*5, int(self.y/RASTER)+self.accel_y*5], 1)
 
 
 def key_events():
@@ -84,7 +81,7 @@ def main():
     running=True
     
     m=list()
-    for i in range(10):
+    for i in range(50):
         x=randint(350*X_SCREEN, X_SCREEN*750)
         y=randint(350*Y_SCREEN, Y_SCREEN*750)
         radius = randint(2,5)

@@ -40,19 +40,22 @@ class Mass:
             if((self.x!=m.x) and (self.y!=m.y)):
                 delta = self._triangle(m.x, m.y)
                 #print delta, 
-                self.accel_x = self.accel_x + ACCEL*(1.0*self.d*m.d)*(m.x-self.x)/(delta*delta)
-                self.accel_y = self.accel_y + ACCEL*(1.0*self.d*m.d)*(m.y-self.y)/(delta*delta)
+                ma = (self.d*m.d)/(delta*delta)
+                self.accel_x = self.accel_x + ACCEL*(m.x-self.x)*ma
+                self.accel_y = self.accel_y + ACCEL*(m.y-self.y)*ma
         #print "xy ( %d | %d) v: ( %d | %d) acell: ( %f | %f ) "%(self.x,self.y, self.speed_x, self.speed_y,self.accel_x,self.accel_y)
         self.speed_x = self.speed_x + self.accel_x
         self.speed_y = self.speed_y + self.accel_y
     
     def draw_me(self, screen):
+        x=int(self.x/RASTER)
+        y=int(self.y/RASTER)
         # draw the object
-        pygame.draw.circle(screen, BLUE, [int(self.x/RASTER), int(self.y/RASTER)], self.d)
+        pygame.draw.circle(screen, BLUE, [x, y], self.d)
         # draw the veloecity
-        pygame.draw.line(screen, WHITE, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.speed_x/10, int(self.y/RASTER)+self.speed_y/10], 1)
+        pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
         # draw the acceleration
-        pygame.draw.line(screen, RED, [int(self.x/RASTER), int(self.y/RASTER)], [int(self.x/RASTER)+self.accel_x*5, int(self.y/RASTER)+self.accel_y*5], 1)
+        pygame.draw.line(screen, RED, [x, y], [x+self.accel_x*2, y+self.accel_y*2], 1)
 
 
 def key_events():
@@ -81,6 +84,7 @@ def main():
     running=True
     
     m=list()
+    print "create random objects"
     for i in range(50):
         x=randint(350*X_SCREEN, X_SCREEN*750)
         y=randint(350*Y_SCREEN, Y_SCREEN*750)

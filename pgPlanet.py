@@ -15,14 +15,14 @@ GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
 
 class Mass:
-    def __init__(self,x,y,d,xv,yv, xa, ya):
+    def __init__(self,x,y,d,xv,yv):
         self.x=x
         self.y=y
-        self.d=d  # durchmesser
+        self.d=d  # durchmesser, masse
         self.speed_x=xv
         self.speed_y=yv
-        self.accel_x=xa
-        self.accel_y=ya
+        self.accel_x=0.0
+        self.accel_y=0.0
     
     def calc_xy(self):
         self.x = self.x + self.speed_x
@@ -53,10 +53,29 @@ class Mass:
         # draw the object
         pygame.draw.circle(screen, BLUE, [x, y], self.d)
         # draw the veloecity
-        pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
+        #pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
         # draw the acceleration
-        pygame.draw.line(screen, RED, [x, y], [x+self.accel_x*2, y+self.accel_y*2], 1)
+        #pygame.draw.line(screen, RED, [x, y], [x+self.accel_x*2, y+self.accel_y*2], 1)
 
+def get_mass_point(masses):
+    x=0
+    y=0
+    sum_m=0
+    for m in masses:
+        x = x + m.x*m.d
+        y = y + m.y*m.d
+        sum_m = sum_m + m.d
+    #print " (%d|%d, %d) "%(x,y,sum_m)
+    x=x/sum_m
+    y=y/sum_m
+    return (x,y)
+
+def correct_mass_point(masses):
+    x,y=get_mass_point(masses)
+    #print "  M: ", masses[0].x, masses[0].y, " S: ", x, y
+    for m in masses:
+        m.x = m.x - x + X_SCREEN*RASTER/2
+        m.y = m.y - y + Y_SCREEN*RASTER/2
 
 def key_events():
     for event in pygame.event.get():
@@ -85,22 +104,25 @@ def main():
     
     m=list()
     print "create random objects"
-    for i in range(50):
-        x=randint(350*X_SCREEN, X_SCREEN*750)
-        y=randint(350*Y_SCREEN, Y_SCREEN*750)
+    for i in range(250):
+        x=randint(350*X_SCREEN, X_SCREEN*650)
+        y=randint(350*Y_SCREEN, Y_SCREEN*650)
         radius = randint(2,5)
         xv = randint(-15,15)
         yv = randint(-15,15)
-        print "( %d | %d ) r: %d   xv: %d  yv: %d"%(int(x/RASTER),int(y/RASTER), radius, xv, yv)
-        m.append(Mass(x,y,radius, xv, yv,0,0))
+        #print "( %d | %d ) r: %d   xv: %d  yv: %d"%(int(x/RASTER),int(y/RASTER), radius, xv, yv)
+        m.append(Mass(x,y, radius, xv, yv))
     while running:
         #clock.tick(60) # frame rate 60 ticks
         screen.fill((0, 0, 0))
         running = key_events()
+        correct_mass_point(m)
         for m1 in m:
             m1.calc_speed(m)
             m1.calc_xy()
-            m1.draw_me(screen)
+            m1.draw_me(screen)   
+        pygame.draw.line(screen, GREEN, [X_SCREEN/2-20, Y_SCREEN/2], [X_SCREEN/2+20, Y_SCREEN/2], 1)
+        pygame.draw.line(screen, GREEN, [X_SCREEN/2, Y_SCREEN/2-20], [X_SCREEN/2, Y_SCREEN/2+20], 1)
         pygame.display.flip()
 
 

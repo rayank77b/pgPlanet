@@ -6,7 +6,7 @@ import math
 X_SCREEN=1024
 Y_SCREEN=800
 RASTER=3001
-ACCEL=5000.0
+ACCEL=0.01
 
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
@@ -15,12 +15,12 @@ GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
 
 class Mass:
-    def __init__(self,x,y,d,xv,yv):
+    def __init__(self,x,y,d):
         self.x=x
         self.y=y
         self.d=d  # durchmesser, masse
-        self.speed_x=xv
-        self.speed_y=yv
+        self.speed_x=0.0
+        self.speed_y=0.0
         self.accel_x=0.0
         self.accel_y=0.0
     
@@ -47,6 +47,13 @@ class Mass:
         self.speed_x = self.speed_x + self.accel_x
         self.speed_y = self.speed_y + self.accel_y
     
+    def get_radius(self):
+        r = self.d/RASTER
+        if r < 1 :
+            return 1
+        else:
+            return int(r)
+        
     def draw_me(self, screen, mx, my):
         x = int(self.x/RASTER)
         y = int(self.y/RASTER)
@@ -56,7 +63,7 @@ class Mass:
         maxy = my/RASTER + Y_SCREEN/2
         if((x>minx)and(y>miny)and(x<maxx)and(y<maxy)): # no need to draw all objects
             # draw the object
-            pygame.draw.circle(screen, BLUE, [int(x-minx), int(y-miny)], self.d)
+            pygame.draw.circle(screen, BLUE, [int(x-minx), int(y-miny)], self.get_radius())
             # draw the veloecity
             #pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
             # draw the acceleration
@@ -116,11 +123,9 @@ def main():
     for i in range(250):
         x=randint(0, X_SCREEN*RASTER)
         y=randint(0, Y_SCREEN*RASTER)
-        radius = randint(2,5)
-        xv = randint(-15,15)
-        yv = randint(-15,15)
+        radius = randint(100,10000)
         #print "( %d | %d ) r: %d   xv: %d  yv: %d"%(int(x/RASTER),int(y/RASTER), radius, xv, yv)
-        m.append(Mass(x,y, radius, xv, yv))
+        m.append(Mass(x,y, radius))
     while running:
         #clock.tick(60) # frame rate 60 ticks
         screen.fill((0, 0, 0))

@@ -5,7 +5,7 @@ import math
 
 X_SCREEN=1024
 Y_SCREEN=800
-RASTER=3000
+RASTER=3001
 ACCEL=5000.0
 
 BLACK = (  0,   0,   0)
@@ -47,15 +47,20 @@ class Mass:
         self.speed_x = self.speed_x + self.accel_x
         self.speed_y = self.speed_y + self.accel_y
     
-    def draw_me(self, screen):
-        x=int(self.x/RASTER)
-        y=int(self.y/RASTER)
-        # draw the object
-        pygame.draw.circle(screen, BLUE, [x, y], self.d)
-        # draw the veloecity
-        #pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
-        # draw the acceleration
-        #pygame.draw.line(screen, RED, [x, y], [x+self.accel_x*2, y+self.accel_y*2], 1)
+    def draw_me(self, screen, mx, my):
+        x = int(self.x/RASTER)
+        y = int(self.y/RASTER)
+        minx = mx/RASTER - X_SCREEN/2
+        miny = my/RASTER - Y_SCREEN/2
+        maxx = mx/RASTER + X_SCREEN/2
+        maxy = my/RASTER + Y_SCREEN/2
+        if((x>minx)and(y>miny)and(x<maxx)and(y<maxy)): # no need to draw all objects
+            # draw the object
+            pygame.draw.circle(screen, BLUE, [int(x-minx), int(y-miny)], self.d)
+            # draw the veloecity
+            #pygame.draw.line(screen, WHITE, [x, y], [x+self.speed_x/20, y+self.speed_y/20], 1)
+            # draw the acceleration
+            #pygame.draw.line(screen, RED, [x, y], [x+self.accel_x*2, y+self.accel_y*2], 1)
 
 def get_mass_point(masses):
     x=0
@@ -70,13 +75,6 @@ def get_mass_point(masses):
     y=y/sum_m
     return (x,y)
 
-def correct_mass_point(masses):
-    x,y=get_mass_point(masses)
-    #print "  M: ", masses[0].x, masses[0].y, " S: ", x, y
-    for m in masses:
-        m.x = m.x - x + X_SCREEN*RASTER/2
-        m.y = m.y - y + Y_SCREEN*RASTER/2
-
 def key_events():
     global RASTER
     for event in pygame.event.get():
@@ -88,6 +86,8 @@ def key_events():
             if event.key == pygame.K_f:
                 if(RASTER>100):
                     RASTER = RASTER - 100
+                    if(RASTER<1):
+                        RASTER=1
             if event.key == pygame.K_g:
                 RASTER = RASTER + 100
     return True
@@ -114,8 +114,8 @@ def main():
     m=list()
     print "create random objects"
     for i in range(250):
-        x=randint(350*X_SCREEN, X_SCREEN*650)
-        y=randint(350*Y_SCREEN, Y_SCREEN*650)
+        x=randint(0, X_SCREEN*RASTER)
+        y=randint(0, Y_SCREEN*RASTER)
         radius = randint(2,5)
         xv = randint(-15,15)
         yv = randint(-15,15)
@@ -124,14 +124,14 @@ def main():
     while running:
         #clock.tick(60) # frame rate 60 ticks
         screen.fill((0, 0, 0))
-        textsurface = myfont.render('Raster: %d'%RASTER, False, (255, 255, 255))
+        min_x, min_y = get_mass_point(m)
+        textsurface = myfont.render('Raster: %d (%d|%d)'%(RASTER, min_x, min_y), False, (255, 255, 255))
         screen.blit(textsurface,(0,0))
         running = key_events()
-        correct_mass_point(m)
         for m1 in m:
             m1.calc_speed(m)
             m1.calc_xy()
-            m1.draw_me(screen)   
+            m1.draw_me(screen, min_x, min_y)
         pygame.draw.line(screen, GREEN, [X_SCREEN/2-20, Y_SCREEN/2], [X_SCREEN/2+20, Y_SCREEN/2], 1)
         pygame.draw.line(screen, GREEN, [X_SCREEN/2, Y_SCREEN/2-20], [X_SCREEN/2, Y_SCREEN/2+20], 1)
         pygame.display.flip()

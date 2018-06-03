@@ -78,12 +78,18 @@ def correct_mass_point(masses):
         m.y = m.y - y + Y_SCREEN*RASTER/2
 
 def key_events():
+    global RASTER
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return False
+            if event.key == pygame.K_f:
+                if(RASTER>100):
+                    RASTER = RASTER - 100
+            if event.key == pygame.K_g:
+                RASTER = RASTER + 100
     return True
 
 def randdirect():
@@ -98,6 +104,9 @@ def main():
     pygame.display.set_caption("pgPlanet Version 0.01")
     pygame.mouse.set_visible(1)
     pygame.key.set_repeat(1, 30)
+
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
     clock = pygame.time.Clock()
     running=True
@@ -115,6 +124,8 @@ def main():
     while running:
         #clock.tick(60) # frame rate 60 ticks
         screen.fill((0, 0, 0))
+        textsurface = myfont.render('Raster: %d'%RASTER, False, (255, 255, 255))
+        screen.blit(textsurface,(0,0))
         running = key_events()
         correct_mass_point(m)
         for m1 in m:

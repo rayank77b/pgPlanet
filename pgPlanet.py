@@ -5,7 +5,7 @@ import math
 
 X_SCREEN=1024
 Y_SCREEN=800
-RASTER=1000
+RASTER=3000
 ACCEL=5000.0
 
 BLACK = (  0,   0,   0)
